@@ -17,7 +17,7 @@ namespace RecommendationEngine.Repositories
                 {
                     cmd.Parameters.AddWithValue("@Name", menuItem.Name);
                     cmd.Parameters.AddWithValue("@Price", menuItem.Price);
-                    cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus);
+                    cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus ? 1 : 0);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -28,13 +28,13 @@ namespace RecommendationEngine.Repositories
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "UPDATE MenuItems SET Name='@Name', Price = '@Price', AvailabilityStatus = '@AvailabilityStatus' where ID = @Id";
-                //var query = "UPDATE MenuItems  (Name, Price, AvailabilityStatus) VALUES (@Name, @Price, @AvailabilityStatus)";
+                var query = "UPDATE MenuItems SET Name = @Name, Price = @Price, AvailabilityStatus = @AvailabilityStatus WHERE Id = @Id";
                 using (var cmd = new MySqlCommand(query, connection))
                 {
+                    cmd.Parameters.AddWithValue("@Id", menuItem.Id);
                     cmd.Parameters.AddWithValue("@Name", menuItem.Name);
                     cmd.Parameters.AddWithValue("@Price", menuItem.Price);
-                    cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus);
+                    cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus ? 1 : 0);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -98,7 +98,7 @@ namespace RecommendationEngine.Repositories
                             Id = reader.GetInt32("Id"),
                             Name = reader.GetString("Name"),
                             Price = reader.GetDecimal("Price"),
-                            AvailabilityStatus = reader.GetInt32("AvailabilityStatus") == 'Y'
+                            AvailabilityStatus = reader.GetBoolean("AvailabilityStatus")
                         };
                         menuItems.Add(menuItem);
                     }
