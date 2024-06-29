@@ -31,11 +31,11 @@ namespace RecommendationEngine.Services
             }
         }
 
-        public void GiveFeedback(int menuItemId, int rating, string comment)
+        public void GiveFeedback(int menuItemId, int rating, string comment, int userId)
         {
             var feedback = new Feedback
             {
-                UserId = 1, // Example userId, replace with actual logic
+                UserId = userId, 
                 MenuItemId = menuItemId,
                 Rating = rating,
                 Comment = comment,

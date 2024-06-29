@@ -54,7 +54,7 @@ namespace RecommendationEngine.Sockets
 
             var authService = _serviceProvider.GetService<IAuthService>();
 
-            if (authService.Authenticate(employeeId, name, out string role))
+            if (authService.Authenticate(employeeId, name, out string role, out int userId))
             {
                 var message = $"Welcome {name}! You are logged in as {role}.\n";
 
@@ -68,7 +68,7 @@ namespace RecommendationEngine.Sockets
                 }
                 else if (role == "Employee")
                 {
-                    message += "Employee Actions:\nPress 1 to choose a menu item\nPress 2 to give feedback on a menu item\nPress 3 to Logout\n";
+                    message += "Employee Actions:\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to Logout\n";
                 }
                 else
                 {
@@ -92,7 +92,7 @@ namespace RecommendationEngine.Sockets
                     }
                     else if (role == "Employee")
                     {
-                        message = HandleEmployeeActions(stream, choice);
+                        message = HandleEmployeeActions(stream, choice, userId);
                     }
 
                     SendMessage(stream, message);
@@ -308,7 +308,7 @@ namespace RecommendationEngine.Sockets
             return message;
         }
 
-        private string HandleEmployeeActions(NetworkStream stream, string choice)
+        private string HandleEmployeeActions(NetworkStream stream, string choice, int userId)
         {
             var employeeService = _serviceProvider.GetService<IEmployeeService>();
             var menuService = _serviceProvider.GetService<IMenuService>();
@@ -382,7 +382,7 @@ namespace RecommendationEngine.Sockets
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var comment = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
-                    employeeService.GiveFeedback(feedbackItemId, rating, comment);
+                    employeeService.GiveFeedback(feedbackItemId, rating, comment, userId);
                     message = "Feedback submitted.\n";
                     Console.WriteLine(message);
                     break;

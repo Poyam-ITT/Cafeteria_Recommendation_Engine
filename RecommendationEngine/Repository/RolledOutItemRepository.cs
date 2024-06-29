@@ -5,7 +5,6 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
-using static Google.Protobuf.Reflection.FeatureSet.Types;
 
 namespace RecommendationEngine.Repositories
 {
@@ -33,11 +32,16 @@ namespace RecommendationEngine.Repositories
 
         public List<RolledOutItem> GetRolledOutItems(MenuType menuType)
         {
-            using (var connection = new MySqlConnection(AppConfig.ConnectionString))
+            using (var connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
+                var query = @"
+                            SELECT roi.*, mi.Name, mi.Price, roi.RecommendationScore, roi.AverageRating, roi.SentimentScore
+                            FROM RolledOutItems roi 
+                            JOIN MenuItems mi ON roi.MenuItemId = mi.Id 
+                            WHERE roi.MenuType = @MenuType";
                 return connection.Query<RolledOutItem, MenuItem, RolledOutItem>(
-                    "SELECT r.*, m.* FROM RolledOutItems r JOIN MenuItems m ON r.MenuItemId = m.Id WHERE r.MenuType = @MenuType",
+                    query,
                     (rolledOutItem, menuItem) =>
                     {
                         rolledOutItem.MenuItem = menuItem;

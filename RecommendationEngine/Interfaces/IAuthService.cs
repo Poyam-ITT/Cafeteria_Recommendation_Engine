@@ -2,6 +2,6 @@
 {
     public interface IAuthService
     {
-        bool Authenticate(string employeeId, string name, out string role);
+        bool Authenticate(string employeeId, string name, out string role, out int userId);
     }
 }
