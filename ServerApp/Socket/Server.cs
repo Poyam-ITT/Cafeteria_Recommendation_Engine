@@ -230,13 +230,36 @@ namespace RecommendationEngine.Sockets
                     SendMessage(stream, message);
 
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var menuTypeStr = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+                    var typeOfMenu = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
-                    if (!Enum.TryParse<MenuType>(menuTypeStr, true, out MenuType menuType))
+                    if (!Enum.TryParse<MenuType>(typeOfMenu, true, out MenuType menuType))
                     {
                         message = "Invalid menu type.\n";
+                        SendMessage(stream, message);
                         break;
                     }
+
+                    message = "Enter recommended item list size:\n";
+                    SendMessage(stream, message);
+
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var listSize = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+
+                    var recommendedItems = chefService.GetFoodItemForNextDay(menuType, listSize);
+                    if (recommendedItems.Count == 0)
+                    {
+                        message = "No recommended items found for the selected menu type.\n";
+                        SendMessage(stream, message);
+                        break;
+                    }
+
+                    message = "Recommended Items:\n";
+                    foreach (var item in recommendedItems)
+                    {
+                        message += $"ID: {item.MenuItem.Id}, Name: {item.MenuItem.Name}, Price: {item.MenuItem.Price}, " +
+                                   $"Recommendation: {item.Score}, Rating: {item.AverageRating}, Sentiment: {item.PositiveSentiments}\n";
+                    }
+                    SendMessage(stream, message);
 
                     message = "Enter number of items to roll out:\n";
                     SendMessage(stream, message);
@@ -244,39 +267,31 @@ namespace RecommendationEngine.Sockets
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var itemCount = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
-                    var items = new List<MenuItem>();
-
+                    var itemsToRollOut = new List<MenuItem>();
                     for (int i = 0; i < itemCount; i++)
                     {
-                        message = $"Enter name for item {i + 1}:\n";
+                        message = $"Enter ID for item {i + 1} to roll out:\n";
                         SendMessage(stream, message);
 
                         bytesRead = stream.Read(buffer, 0, buffer.Length);
-                        var itemName = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+                        var itemId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
-                        message = "Enter price:\n";
-                        SendMessage(stream, message);
-
-                        bytesRead = stream.Read(buffer, 0, buffer.Length);
-                        var itemPrice = decimal.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
-
-                        items.Add(new MenuItem
+                        var selectedItem = recommendedItems.FirstOrDefault(r => r.MenuItem.Id == itemId)?.MenuItem;
+                        if (selectedItem != null)
                         {
-                            Name = itemName,
-                            Price = itemPrice,
-                            AvailabilityStatus = true,
-                            MenuType = menuType
-                        });
+                            itemsToRollOut.Add(selectedItem);
+                        }
+                        else
+                        {
+                            message = $"Item with ID {itemId} not found in recommendations.\n";
+                            SendMessage(stream, message);
+                        }
                     }
 
-                    foreach (var item in items)
-                    {
-                        chefService.RollOutItems(menuType, itemCount);
-                    }
-
+                    chefService.RollOutItems(menuType, itemsToRollOut);
                     message = "Items rolled out.\n";
+                    Console.WriteLine(message); // Log to server console
                     break;
-                    Console.WriteLine(message);
                 case "2":
                     var report = chefService.GenerateMonthlyFeedbackReport();
                     message = $"Monthly Feedback Report:\n{report}\n";

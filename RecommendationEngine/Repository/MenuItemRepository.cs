@@ -87,9 +87,9 @@ namespace RecommendationEngine.Repositories
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM MenuItems";
-                using (var reader = command.ExecuteReader())
+                var query = "SELECT * FROM MenuItems";
+                using (var cmd = new MySqlCommand(query, connection))
+                using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -98,7 +98,8 @@ namespace RecommendationEngine.Repositories
                             Id = reader.GetInt32("Id"),
                             Name = reader.GetString("Name"),
                             Price = reader.GetDecimal("Price"),
-                            AvailabilityStatus = reader.GetBoolean("AvailabilityStatus")
+                            AvailabilityStatus = reader.GetBoolean("AvailabilityStatus"),
+                            MenuType = Enum.Parse<MenuType>(reader.GetString("MenuType"))
                         };
                         menuItems.Add(menuItem);
                     }
@@ -106,6 +107,7 @@ namespace RecommendationEngine.Repositories
             }
             return menuItems;
         }
+
 
         public List<MenuItem> GetItemsByDate(DateTime date)
         {
