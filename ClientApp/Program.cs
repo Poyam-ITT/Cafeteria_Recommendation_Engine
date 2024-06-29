@@ -7,7 +7,7 @@ namespace ClientApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter port number to connect to server (e.g., 5000, 5001, 5002):");
+            Console.WriteLine("Enter port number to connect to server");
             var portInput = Console.ReadLine();
 
             if (int.TryParse(portInput, out var port))

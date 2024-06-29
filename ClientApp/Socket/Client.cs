@@ -37,6 +37,12 @@ namespace RecommendationEngine.Sockets
             {
                 var message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
                 Console.WriteLine("Received: " + message);
+
+                if (message.Contains("Logging out"))
+                {
+                    Disconnect();
+                    break;
+                }
             }
         }
 
@@ -44,6 +50,7 @@ namespace RecommendationEngine.Sockets
         {
             _stream.Close();
             _client.Close();
+            Console.WriteLine("Disconnected from server.");
         }
     }
 }

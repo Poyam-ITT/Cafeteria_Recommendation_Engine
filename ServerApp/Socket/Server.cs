@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using MySqlX.XDevAPI;
 using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
 using RecommendationEngine.Services;
@@ -97,6 +98,11 @@ namespace RecommendationEngine.Sockets
                     }
 
                     SendMessage(stream, message);
+
+                    if(choice == "5" || choice == "3")
+                    {
+                        break;
+                    }
                 }
             }
             else
