@@ -45,12 +45,10 @@ namespace RecommendationEngine.Sockets
             int bytesRead;
 
             // Read Employee ID
-            SendMessage(stream, "Enter Employee ID:\n");
             bytesRead = stream.Read(buffer, 0, buffer.Length);
             var employeeId = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
             // Read Name
-            SendMessage(stream, "Enter Name:\n");
             bytesRead = stream.Read(buffer, 0, buffer.Length);
             var name = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
@@ -150,6 +148,7 @@ namespace RecommendationEngine.Sockets
 
                     menuService.AddMenuItem(itemName, itemPrice, itemStatus);
                     message = "Menu item added.\n";
+                    Console.WriteLine(message);
                     break;
                 case "2":
                     message = "Enter menu item ID:\n";
@@ -178,6 +177,7 @@ namespace RecommendationEngine.Sockets
 
                     menuService.UpdateMenuItem(updateId, newName, newPrice, newStatus);
                     message = "Menu item updated.\n";
+                    Console.WriteLine(message);
                     break;
                 case "3":
                     message = "Enter menu item ID to delete:\n";
@@ -188,6 +188,7 @@ namespace RecommendationEngine.Sockets
 
                     menuService.DeleteMenuItem(deleteId);
                     message = "Menu item deleted.\n";
+                    Console.WriteLine(message);
                     break;
                 case "4":
                     var menuItems = menuService.ViewMenuItems();
@@ -203,6 +204,7 @@ namespace RecommendationEngine.Sockets
                             message += $"ID: {item.Id}, Name: {item.Name}, Price: {item.Price}, Available: {item.AvailabilityStatus}\n";
                         }
                     }
+                    Console.WriteLine(message);
                     break;
                 case "5":
                     return "Logging out admin actions.\n";
@@ -274,14 +276,17 @@ namespace RecommendationEngine.Sockets
 
                     message = "Items rolled out.\n";
                     break;
+                    Console.WriteLine(message);
                 case "2":
                     var report = chefService.GenerateMonthlyFeedbackReport();
                     message = $"Monthly Feedback Report:\n{report}\n";
+                    Console.WriteLine(message);
                     break;
                 case "3":
                     return "Logging out chef actions.\n";
                 default:
                     message = "Invalid choice.\n";
+                    Console.WriteLine(message);
                     break;
             }
 
@@ -326,6 +331,7 @@ namespace RecommendationEngine.Sockets
                     {
                         message = "Invalid menu type.\n";
                     }
+                    Console.WriteLine(message);
                     break;
                 case "2":
                     var menuItems = menuService.ViewMenuItems();
@@ -363,11 +369,13 @@ namespace RecommendationEngine.Sockets
 
                     employeeService.GiveFeedback(feedbackItemId, rating, comment);
                     message = "Feedback submitted.\n";
+                    Console.WriteLine(message);
                     break;
                 case "3":
                     return "Logging out employee actions.\n";
                 default:
                     message = "Invalid choice.\n";
+                    Console.WriteLine(message);
                     break;
             }
 
