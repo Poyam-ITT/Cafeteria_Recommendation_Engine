@@ -68,7 +68,7 @@ namespace RecommendationEngine.Sockets
                 }
                 else if (role == "Employee")
                 {
-                    message += "Employee Actions:\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to Logout\n";
+                    message += "Employee Actions:\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to View Notifications\nPress 4 to Logout\n";
                 }
                 else
                 {
@@ -84,18 +84,18 @@ namespace RecommendationEngine.Sockets
 
                     if (role == "Admin")
                     {
-                        message = HandleAdminActions(stream, choice);
+                        message = HandleAdminActions(stream, choice, userId);
                     }
                     else if (role == "Chef")
                     {
-                        message = HandleChefActions(stream, choice);
+                        message = HandleChefActions(stream, choice, userId);
                     }
                     else if (role == "Employee")
                     {
                         message = HandleEmployeeActions(stream, choice, userId);
                     }
 
-                    if ((role == "Admin" && choice == "5") || (role == "Chef" && choice == "3") || (role == "Employee" && choice == "3"))
+                    if ((role == "Admin" && choice == "5") || (role == "Chef" && choice == "3") || (role == "Employee" && choice == "4"))
                     {
                         SendMessage(stream, "Logging out. Goodbye!");
                         break;
@@ -118,9 +118,10 @@ namespace RecommendationEngine.Sockets
             stream.Write(responseData, 0, responseData.Length);
         }
 
-        private string HandleAdminActions(NetworkStream stream, string choice)
+        private string HandleAdminActions(NetworkStream stream, string choice, int userId)
         {
             var menuService = _serviceProvider.GetService<IMenuService>();
+            var notificationService = _serviceProvider.GetService<INotificationService>();
             var buffer = new byte[1024];
             int bytesRead;
             var message = "";
@@ -159,6 +160,15 @@ namespace RecommendationEngine.Sockets
                     }
 
                     menuService.AddMenuItem(itemName, itemPrice, itemStatus, menuType);
+                    // Send notification
+                    var notification = new Notification
+                    {
+                        UserId = userId,
+                        Message = $"New Item: {itemName}",
+                        Type = NotificationType.NewItem.ToString(),
+                        Date = DateTime.Now
+                    };
+                    notificationService.SendNotification(notification);
                     message = "Menu item added.\n";
                     Console.WriteLine(message);
                     break;
@@ -200,6 +210,15 @@ namespace RecommendationEngine.Sockets
                     }
 
                     menuService.UpdateMenuItem(updateId, newName, newPrice, newStatus, menuType);
+                    //send notification
+                    notification = new Notification
+                    {
+                        UserId = userId,
+                        Message = $"Item Availability Updated: {newName}",
+                        Type = NotificationType.AvailabilityStatus.ToString(),
+                        Date = DateTime.Now
+                    };
+                    notificationService.SendNotification(notification);
                     message = "Menu item updated.\n";
                     Console.WriteLine(message);
                     break;
@@ -240,9 +259,10 @@ namespace RecommendationEngine.Sockets
             return message;
         }
 
-        private string HandleChefActions(NetworkStream stream, string choice)
+        private string HandleChefActions(NetworkStream stream, string choice, int userId)
         {
             var chefService = _serviceProvider.GetService<IChefService>();
+            var notificationService = _serviceProvider.GetService<INotificationService>();
             var buffer = new byte[1024];
             int bytesRead;
             var message = "";
@@ -313,6 +333,15 @@ namespace RecommendationEngine.Sockets
                     }
 
                     chefService.RollOutItems(menuType, itemsToRollOut);
+                    // Send notification
+                    var notification = new Notification
+                    {
+                        UserId = userId,
+                        Message = "Recommendation: New menu items rolled out for tomorrow!",
+                        Type = NotificationType.Recommendation.ToString(),
+                        Date = DateTime.Now
+                    };
+                    notificationService.SendNotification(notification);
                     message = "Items rolled out.\n";
                     Console.WriteLine(message);
                     break;
@@ -335,6 +364,7 @@ namespace RecommendationEngine.Sockets
         private string HandleEmployeeActions(NetworkStream stream, string choice, int userId)
         {
             var employeeService = _serviceProvider.GetService<IEmployeeService>();
+            var notificationService = _serviceProvider.GetService<INotificationService>();
             var menuService = _serviceProvider.GetService<IMenuService>();
             var buffer = new byte[1024];
             int bytesRead;
@@ -411,6 +441,14 @@ namespace RecommendationEngine.Sockets
                     Console.WriteLine(message);
                     break;
                 case "3":
+                    message = "Viewing notifications...\n";
+                    var notifications = notificationService.GetNotifications(1);
+                    foreach (var notification in notifications)
+                    {
+                        message += $"ID: {notification.Id}, Message: {notification.Message}, Type: {notification.Type}, Date: {notification.Date}\n";
+                    }
+                    break;
+                case "4":
                     return "Logging out employee actions.\n";
                 default:
                     message = "Invalid choice.\n";

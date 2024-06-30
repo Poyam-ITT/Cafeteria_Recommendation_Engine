@@ -1,8 +1,9 @@
 ﻿namespace RecommendationEngine.Models
 {
-    public class NotificationType
+    public enum NotificationType
     {
-        public int Id { get; set; }
-        public string TypeOfNotification { get; set; }
+        NewItem,
+        AvailabilityStatus,
+        Recommendation
     }
 }

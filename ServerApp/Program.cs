@@ -25,8 +25,7 @@ namespace ServerApp
                 .AddSingleton<IAuthService, AuthService>()
                 .AddSingleton<IMenuService, MenuService>()
                 .AddSingleton<IFeedbackService, FeedbackService>()
-                /*.AddSingleton<INotificationService>(provider =>
-                    new NotificationService(provider.GetRequiredService<INotificationRepository>(), 5000))*/
+                .AddSingleton<INotificationService, NotificationService>()
                 .AddSingleton<IChefService, ChefService>()
                 .AddSingleton<IEmployeeService, EmployeeService>()
                 .AddSingleton<IRecommendationEngine, RecommendationEngine.Services.RecommendationEngine>() 

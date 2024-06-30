@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
+using RecommendationEngine.Models;
 
 namespace RecommendationEngine.Interfaces
 {
-    public interface I
-
+    public interface INotificationService
     {
-        void SendRecommendationNotification(string message);
-        void SendNewItemNotification(string message);
-        void SendAvailabilityStatusNotification(string message);
-        void SendNotification(string message);
+        void SendNotification(Notification notification);
+        public IEnumerable<Notification> GetNotifications(int userId);
     }
 }
