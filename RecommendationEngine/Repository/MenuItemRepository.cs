@@ -12,12 +12,13 @@ namespace RecommendationEngine.Repositories
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "INSERT INTO MenuItems (Name, Price, AvailabilityStatus) VALUES (@Name, @Price, @AvailabilityStatus)";
+                var query = "INSERT INTO MenuItems (Name, Price, AvailabilityStatus, MenuType) VALUES (@Name, @Price, @AvailabilityStatus, @MenuType)";
                 using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Name", menuItem.Name);
                     cmd.Parameters.AddWithValue("@Price", menuItem.Price);
                     cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus ? 1 : 0);
+                    cmd.Parameters.AddWithValue("@MenuType", menuItem.MenuType.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -28,13 +29,14 @@ namespace RecommendationEngine.Repositories
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "UPDATE MenuItems SET Name = @Name, Price = @Price, AvailabilityStatus = @AvailabilityStatus WHERE Id = @Id";
+                var query = "UPDATE MenuItems SET Name = @Name, Price = @Price, AvailabilityStatus = @AvailabilityStatus, MenuType = @MenuType WHERE Id = @Id";
                 using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", menuItem.Id);
                     cmd.Parameters.AddWithValue("@Name", menuItem.Name);
                     cmd.Parameters.AddWithValue("@Price", menuItem.Price);
                     cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus ? 1 : 0);
+                    cmd.Parameters.AddWithValue("@MenuType", menuItem.MenuType.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }

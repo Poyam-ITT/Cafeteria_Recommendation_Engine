@@ -95,12 +95,12 @@ namespace RecommendationEngine.Sockets
                         message = HandleEmployeeActions(stream, choice, userId);
                     }
 
-                    SendMessage(stream, message);
-
-                    if(choice == "5" || choice == "3")
+                    if ((role == "Admin" && choice == "5") || (role == "Chef" && choice == "3") || (role == "Employee" && choice == "3"))
                     {
+                        SendMessage(stream, "Logging out. Goodbye!");
                         break;
                     }
+                    SendMessage(stream, message);
                 }
             }
             else
@@ -146,12 +146,24 @@ namespace RecommendationEngine.Sockets
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var itemStatus = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
-                    menuService.AddMenuItem(itemName, itemPrice, itemStatus);
+                    message = "Enter menu type (Breakfast, Lunch, Dinner):\n";
+                    SendMessage(stream, message);
+
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var itemType = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    if (!Enum.TryParse<MenuType>(itemType, true, out MenuType menuType))
+                    {
+                        message = "Invalid menu type.\n";
+                        break;
+                    }
+
+                    menuService.AddMenuItem(itemName, itemPrice, itemStatus, menuType);
                     message = "Menu item added.\n";
                     Console.WriteLine(message);
                     break;
                 case "2":
-                    message = "Enter menu item ID:\n";
+                    message = "Enter menu item ID to update:\n";
                     SendMessage(stream, message);
 
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
@@ -175,7 +187,19 @@ namespace RecommendationEngine.Sockets
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var newStatus = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
-                    menuService.UpdateMenuItem(updateId, newName, newPrice, newStatus);
+                    message = "Enter new menu type (Breakfast, Lunch, Dinner):\n";
+                    SendMessage(stream, message);
+
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var newType = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    if (!Enum.TryParse<MenuType>(newType, true, out menuType))
+                    {
+                        message = "Invalid menu type.\n";
+                        break;
+                    }
+
+                    menuService.UpdateMenuItem(updateId, newName, newPrice, newStatus, menuType);
                     message = "Menu item updated.\n";
                     Console.WriteLine(message);
                     break;
@@ -201,7 +225,7 @@ namespace RecommendationEngine.Sockets
                         message = "Menu Items:\n";
                         foreach (var item in menuItems)
                         {
-                            message += $"ID: {item.Id}, Name: {item.Name}, Price: {item.Price}, Available: {item.AvailabilityStatus}\n";
+                            message += $"ID: {item.Id}, Name: {item.Name}, Price: {item.Price}, Available: {item.AvailabilityStatus}, Type: {item.MenuType}\n";
                         }
                     }
                     Console.WriteLine(message);
@@ -290,7 +314,7 @@ namespace RecommendationEngine.Sockets
 
                     chefService.RollOutItems(menuType, itemsToRollOut);
                     message = "Items rolled out.\n";
-                    Console.WriteLine(message); // Log to server console
+                    Console.WriteLine(message);
                     break;
                 case "2":
                     var report = chefService.GenerateMonthlyFeedbackReport();
@@ -359,7 +383,7 @@ namespace RecommendationEngine.Sockets
                         message = "Menu Items:\n";
                         foreach (var item in menuItems)
                         {
-                            message += $"ID: {item.Id}, Name: {item.Name}, Price: {item.Price}, Available: {item.AvailabilityStatus}\n";
+                            message += $"ID: {item.Id}, Name: {item.Name}, Price: {item.Price}, Available: {item.AvailabilityStatus}, Type: {item.MenuType}\n";
                         }
                     }
                     SendMessage(stream, message);

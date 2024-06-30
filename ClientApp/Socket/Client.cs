@@ -31,16 +31,29 @@ namespace RecommendationEngine.Sockets
         public void ReceiveMessages()
         {
             var buffer = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = _stream.Read(buffer, 0, buffer.Length)) != 0)
+            while (true)
             {
-                var message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                Console.WriteLine("Received: " + message);
-
-                if (message.Contains("Logging out"))
+                try
                 {
-                    Disconnect();
+                    int bytesRead = _stream.Read(buffer, 0, buffer.Length);
+                    if (bytesRead == 0)
+                    {
+                        Console.WriteLine("Disconnected from server.");
+                        break;
+                    }
+                    var message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine("Received: " + message);
+
+                    if (message.Contains("Logging out") || message.Contains("DISCONNECT"))
+                    {
+                        Console.WriteLine("Logged out. Disconnecting...");
+                        _client.Close();
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
                     break;
                 }
             }
