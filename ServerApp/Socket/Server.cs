@@ -27,7 +27,6 @@ namespace RecommendationEngine.Sockets
         {
             _listener = new TcpListener(IPAddress.Any, _port);
             _listener.Start();
-            Console.WriteLine($"Server started...");
 
             while (true)
             {
@@ -487,6 +486,7 @@ namespace RecommendationEngine.Sockets
                     {
                         message += $"ID: {notification.Id}, Message: {notification.Message}, Type: {notification.Type}, Date: {notification.Date}\n";
                     }
+                    Console.WriteLine(message);
                     break;
                 case "4":
                     message = "Updating your profile...\n";

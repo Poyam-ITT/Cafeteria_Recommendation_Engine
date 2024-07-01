@@ -38,14 +38,19 @@ namespace ServerApp
             // Initialize Database
             DbUtils.InitializeDatabase();
 
-            // Start Servers on different ports
-            var serverPorts = new[] { 5000, 5001, 5002 };
-            foreach (var port in serverPorts)
+            int startingPort = 5000;
+            int totalOptions = 10;
+
+            for (int i = 0; i < totalOptions; i++)
             {
+                int port = startingPort + i;
                 var server = new Server(port, serviceProvider);
-                var serverThread = new Thread(server.Start);
+
+                Thread serverThread = new Thread(server.Start);
                 serverThread.Start();
             }
+
+            Console.WriteLine("Server running...");
         }
     }
 }
