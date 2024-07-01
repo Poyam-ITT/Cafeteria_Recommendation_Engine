@@ -5,8 +5,7 @@ namespace RecommendationEngine.Interfaces
 {
     public interface IChefService
     {
-        void RollOutItems(MenuType menuType, List<MenuItem> itemsToRollOut);
-        public List<RecommendedItem> GetFoodItemForNextDay(MenuType menuType, int returnItemListSize);
+        void RollOutItems(MenuType menuType, List<MenuItem> itemsToRollOut, int userId);
         List<MenuItem> GetRolledOutItems();
         string GenerateMonthlyFeedbackReport();
     }

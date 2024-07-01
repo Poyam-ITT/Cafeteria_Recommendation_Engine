@@ -13,28 +13,25 @@ namespace RecommendationEngine.Services
             _menuItemRepository = menuItemRepository;
         }
 
-        public void AddMenuItem(string name, decimal price, bool availabilityStatus, MenuType menuType)
+        public void AddMenuItem(MenuItem menuItem)
         {
-            var menuItem = new MenuItem
-            {
-                Name = name,
-                Price = price,
-                AvailabilityStatus = availabilityStatus,
-                MenuType = menuType
-            };
             _menuItemRepository.Save(menuItem);
         }
 
-        public void UpdateMenuItem(int id, string name, decimal price, bool availabilityStatus, MenuType menuType)
+        public void UpdateMenuItem(int id, MenuItem menuItem)
         {
-            var menuItem = _menuItemRepository.FindById(id);
-            if (menuItem != null)
+            var existingMenuItem = _menuItemRepository.FindById(id);
+            if (existingMenuItem != null)
             {
-                menuItem.Name = name;
-                menuItem.Price = price;
-                menuItem.AvailabilityStatus = availabilityStatus;
-                menuItem.MenuType = menuType;
-                _menuItemRepository.Update(menuItem);
+                existingMenuItem.Name = menuItem.Name;
+                existingMenuItem.Price = menuItem.Price;
+                existingMenuItem.AvailabilityStatus = menuItem.AvailabilityStatus;
+                existingMenuItem.MenuType = menuItem.MenuType;
+                existingMenuItem.IsVegetarian = menuItem.IsVegetarian;
+                existingMenuItem.IsNonVegetarian = menuItem.IsNonVegetarian;
+                existingMenuItem.IsEggetarian = menuItem.IsEggetarian;
+                existingMenuItem.SpiceLevel = menuItem.SpiceLevel;
+                _menuItemRepository.Update(existingMenuItem);
             }
         }
 

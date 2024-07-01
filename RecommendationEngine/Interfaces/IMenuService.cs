@@ -5,8 +5,8 @@ namespace RecommendationEngine.Interfaces
 {
     public interface IMenuService
     {
-        void AddMenuItem(string name, decimal price, bool availabilityStatus, MenuType menuType);
-        void UpdateMenuItem(int id, string name, decimal price, bool availabilityStatus, MenuType menuType);
+        void AddMenuItem(MenuItem menuItem);
+        void UpdateMenuItem(int id, MenuItem menuItem);
         void DeleteMenuItem(int id);
         List<MenuItem> ViewMenuItems(); 
     }

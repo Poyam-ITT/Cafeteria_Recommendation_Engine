@@ -68,7 +68,7 @@ namespace RecommendationEngine.Sockets
                 }
                 else if (role == "Employee")
                 {
-                    message += "Employee Actions:\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to View Notifications\nPress 4 to Logout\n";
+                    message += "Employee Actions:\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to View Notifications\nPress 4 to Update Profile\nPress 5 to Logout\n";
                 }
                 else
                 {
@@ -95,7 +95,7 @@ namespace RecommendationEngine.Sockets
                         message = HandleEmployeeActions(stream, choice, userId);
                     }
 
-                    if ((role == "Admin" && choice == "5") || (role == "Chef" && choice == "3") || (role == "Employee" && choice == "4"))
+                    if ((role == "Admin" && choice == "5") || (role == "Chef" && choice == "3") || (role == "Employee" && choice == "5"))
                     {
                         SendMessage(stream, "Logging out. Goodbye!");
                         break;
@@ -129,27 +129,25 @@ namespace RecommendationEngine.Sockets
             switch (choice)
             {
                 case "1":
+                    var menuItem = new MenuItem();
+
                     message = "Enter menu item name:\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var itemName = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+                    menuItem.Name = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
                     message = "Enter menu item price:\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var itemPrice = decimal.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+                    menuItem.Price = decimal.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
                     message = "Enter menu item availability status (true/false):\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var itemStatus = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+                    menuItem.AvailabilityStatus = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
                     message = "Enter menu type (Breakfast, Lunch, Dinner):\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var itemType = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
@@ -158,48 +156,68 @@ namespace RecommendationEngine.Sockets
                         message = "Invalid menu type.\n";
                         break;
                     }
+                    menuItem.MenuType = menuType;
 
-                    menuService.AddMenuItem(itemName, itemPrice, itemStatus, menuType);
+                    message = "Is the menu item vegetarian? (true/false):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    menuItem.IsVegetarian = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+
+                    message = "Is the menu item non-vegetarian? (true/false):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    menuItem.IsNonVegetarian = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+
+                    message = "Is the menu item eggetarian? (true/false):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    menuItem.IsEggetarian = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+
+                    message = "Enter spice level:\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    menuItem.SpiceLevel = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    menuService.AddMenuItem(menuItem);
+
                     // Send notification
                     var notification = new Notification
                     {
                         UserId = userId,
-                        Message = $"New Item: {itemName}",
+                        Message = $"New Item: {menuItem.Name}",
                         Type = NotificationType.NewItem.ToString(),
                         Date = DateTime.Now
                     };
                     notificationService.SendNotification(notification);
+
                     message = "Menu item added.\n";
                     Console.WriteLine(message);
                     break;
                 case "2":
                     message = "Enter menu item ID to update:\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var updateId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
+                    var updateItem = new MenuItem();
+
                     message = "Enter new menu item name:\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var newName = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+                    updateItem.Name = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
                     message = "Enter new menu item price:\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var newPrice = decimal.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+                    updateItem.Price = decimal.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
                     message = "Enter new menu item availability status (true/false):\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var newStatus = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+                    updateItem.AvailabilityStatus = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
                     message = "Enter new menu type (Breakfast, Lunch, Dinner):\n";
                     SendMessage(stream, message);
-
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var newType = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
@@ -208,17 +226,37 @@ namespace RecommendationEngine.Sockets
                         message = "Invalid menu type.\n";
                         break;
                     }
+                    updateItem.MenuType = menuType;
 
-                    menuService.UpdateMenuItem(updateId, newName, newPrice, newStatus, menuType);
-                    //send notification
+                    message = "Is the menu item vegetarian? (true/false):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    updateItem.IsVegetarian = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+
+                    message = "Is the menu item non-vegetarian? (true/false):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    updateItem.IsEggetarian = bool.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+
+                    message = "Enter new spice level:\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    updateItem.SpiceLevel = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    menuService.UpdateMenuItem(updateId, updateItem);
+
+                    // Send notification
                     notification = new Notification
                     {
                         UserId = userId,
-                        Message = $"Item Availability Updated: {newName}",
+                        Message = $"Item Updated: {updateItem.Name}",
                         Type = NotificationType.AvailabilityStatus.ToString(),
                         Date = DateTime.Now
                     };
                     notificationService.SendNotification(notification);
+
                     message = "Menu item updated.\n";
                     Console.WriteLine(message);
                     break;
@@ -262,6 +300,7 @@ namespace RecommendationEngine.Sockets
         private string HandleChefActions(NetworkStream stream, string choice, int userId)
         {
             var chefService = _serviceProvider.GetService<IChefService>();
+            var recommendationEngine = _serviceProvider.GetService<IRecommendationEngine>();
             var notificationService = _serviceProvider.GetService<INotificationService>();
             var buffer = new byte[1024];
             int bytesRead;
@@ -289,7 +328,7 @@ namespace RecommendationEngine.Sockets
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
                     var listSize = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
 
-                    var recommendedItems = chefService.GetFoodItemForNextDay(menuType, listSize);
+                    var recommendedItems = recommendationEngine.GetFoodItemForNextDay(menuType, listSize, userId);
                     if (recommendedItems.Count == 0)
                     {
                         message = "No recommended items found for the selected menu type.\n";
@@ -332,7 +371,7 @@ namespace RecommendationEngine.Sockets
                         }
                     }
 
-                    chefService.RollOutItems(menuType, itemsToRollOut);
+                    chefService.RollOutItems(menuType, itemsToRollOut, userId);
                     // Send notification
                     var notification = new Notification
                     {
@@ -364,6 +403,7 @@ namespace RecommendationEngine.Sockets
         private string HandleEmployeeActions(NetworkStream stream, string choice, int userId)
         {
             var employeeService = _serviceProvider.GetService<IEmployeeService>();
+            var profileService = _serviceProvider.GetService<IEmployeeProfileService>();
             var notificationService = _serviceProvider.GetService<INotificationService>();
             var menuService = _serviceProvider.GetService<IMenuService>();
             var buffer = new byte[1024];
@@ -449,6 +489,43 @@ namespace RecommendationEngine.Sockets
                     }
                     break;
                 case "4":
+                    message = "Updating your profile...\n";
+                    SendMessage(stream, message);
+
+                    message = "Please select one (Vegetarian, Non Vegetarian, Eggetarian):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var preferenceType = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    message = "Please select your spice level (High, Medium, Low):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var spiceLevel = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    message = "What do you prefer most? (North Indian, South Indian, Other):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var preferredCuisine = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    message = "Do you have a sweet tooth? (Yes, No):\n";
+                    SendMessage(stream, message);
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var sweetTooth = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim().ToLower() == "yes";
+
+                    var profile = new EmployeeProfile
+                    {
+                        UserId = userId,
+                        PreferenceType = preferenceType,
+                        SpiceLevel = spiceLevel,
+                        PreferredCuisine = preferredCuisine,
+                        SweetTooth = sweetTooth
+                    };
+
+                    profileService.SaveProfile(profile);
+                    message = "Profile updated successfully.\n";
+                    Console.WriteLine(message);
+                    break;
+                case "5":
                     return "Logging out employee actions.\n";
                 default:
                     message = "Invalid choice.\n";

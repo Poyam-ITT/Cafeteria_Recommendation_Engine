@@ -10,19 +10,37 @@ namespace RecommendationEngine.Services
         private readonly IMenuItemRepository _menuItemRepository;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly ISentimentAnalysisService _sentimentAnalysisService;
+        private readonly IEmployeeProfileService _profileService;
 
-        public RecommendationEngine(IMenuItemRepository menuItemRepository, IFeedbackRepository feedbackRepository, ISentimentAnalysisService sentimentAnalysisService)
+        public RecommendationEngine(IMenuItemRepository menuItemRepository, IFeedbackRepository feedbackRepository, ISentimentAnalysisService sentimentAnalysisService, IEmployeeProfileService profileService)
         {
             _menuItemRepository = menuItemRepository;
             _feedbackRepository = feedbackRepository;
             _sentimentAnalysisService = sentimentAnalysisService;
+            _profileService = profileService;
         }
 
-        public List<RecommendedItem> GetFoodItemForNextDay(MenuType menuType, int returnItemListSize)
+        public List<RecommendedItem> GetFoodItemForNextDay(MenuType menuType, int returnItemListSize, int userId)
         {
+            var profile = _profileService.GetProfile(userId);
             var allMenuItems = _menuItemRepository.GetAll();
             var filteredItems = allMenuItems.Where(item => item.MenuType == menuType).ToList();
             var feedbacks = _feedbackRepository.GetAll();
+
+            // Sort and filter based on profile preferences
+            if (profile != null)
+            {
+                filteredItems = filteredItems
+                    .Where(item =>
+                        (profile.PreferenceType == "Vegetarian" && item.IsVegetarian) ||
+                        (profile.PreferenceType == "Non Vegetarian" && item.IsNonVegetarian) ||
+                        (profile.PreferenceType == "Eggetarian" && item.IsEggetarian))
+                    .OrderByDescending(item =>
+                        (profile.SpiceLevel == "High" && item.SpiceLevel == "High") ? 1 :
+                        (profile.SpiceLevel == "Medium" && item.SpiceLevel == "Medium") ? 1 :
+                        (profile.SpiceLevel == "Low" && item.SpiceLevel == "Low") ? 1 : 0)
+                    .ToList();
+            }
 
             var scoredItems = filteredItems.Select(item =>
             {

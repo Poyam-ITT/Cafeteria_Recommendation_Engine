@@ -32,7 +32,6 @@
             { "lousy", -2.5 },
             { "exceptional", 4.0 },
             { "fine", 1.0 },
-            { "mediocre", -1.5 },
             { "commendable", 3.0 },
             { "unsatisfactory", -2.0 },
         };

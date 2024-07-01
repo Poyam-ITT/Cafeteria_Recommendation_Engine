@@ -12,24 +12,32 @@ namespace RecommendationEngine.Repositories
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "INSERT INTO MenuItems (Name, Price, AvailabilityStatus, MenuType) VALUES (@Name, @Price, @AvailabilityStatus, @MenuType)";
+                var query = "INSERT INTO MenuItems (Name, Price, AvailabilityStatus, MenuType, IsVegetarian, IsNonVegetarian, IsEggetarian, SpiceLevel) " +
+                            "VALUES (@Name, @Price, @AvailabilityStatus, @MenuType, @IsVegetarian, @IsNonVegetarian, @IsEggetarian, @SpiceLevel)";
                 using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Name", menuItem.Name);
                     cmd.Parameters.AddWithValue("@Price", menuItem.Price);
                     cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus ? 1 : 0);
                     cmd.Parameters.AddWithValue("@MenuType", menuItem.MenuType.ToString());
+                    cmd.Parameters.AddWithValue("@IsVegetarian", menuItem.IsVegetarian);
+                    cmd.Parameters.AddWithValue("@IsNonVegetarian", menuItem.IsNonVegetarian);
+                    cmd.Parameters.AddWithValue("@IsEggetarian", menuItem.IsEggetarian);
+                    cmd.Parameters.AddWithValue("@SpiceLevel", menuItem.SpiceLevel);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
 
         public void Update(MenuItem menuItem)
         {
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "UPDATE MenuItems SET Name = @Name, Price = @Price, AvailabilityStatus = @AvailabilityStatus, MenuType = @MenuType WHERE Id = @Id";
+                var query = "UPDATE MenuItems SET Name = @Name, Price = @Price, AvailabilityStatus = @AvailabilityStatus, MenuType = @MenuType, " +
+                            "IsVegetarian = @IsVegetarian, IsNonVegetarian = @IsNonVegetarian, IsEggetarian = @IsEggetarian, SpiceLevel = @SpiceLevel " +
+                            "WHERE Id = @Id";
                 using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", menuItem.Id);
@@ -37,10 +45,15 @@ namespace RecommendationEngine.Repositories
                     cmd.Parameters.AddWithValue("@Price", menuItem.Price);
                     cmd.Parameters.AddWithValue("@AvailabilityStatus", menuItem.AvailabilityStatus ? 1 : 0);
                     cmd.Parameters.AddWithValue("@MenuType", menuItem.MenuType.ToString());
+                    cmd.Parameters.AddWithValue("@IsVegetarian", menuItem.IsVegetarian);
+                    cmd.Parameters.AddWithValue("@IsNonVegetarian", menuItem.IsNonVegetarian);
+                    cmd.Parameters.AddWithValue("@IsEggetarian", menuItem.IsEggetarian);
+                    cmd.Parameters.AddWithValue("@SpiceLevel", menuItem.SpiceLevel);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
 
         public MenuItem FindById(int id)
         {
@@ -101,7 +114,11 @@ namespace RecommendationEngine.Repositories
                             Name = reader.GetString("Name"),
                             Price = reader.GetDecimal("Price"),
                             AvailabilityStatus = reader.GetBoolean("AvailabilityStatus"),
-                            MenuType = Enum.Parse<MenuType>(reader.GetString("MenuType"))
+                            MenuType = Enum.Parse<MenuType>(reader.GetString("MenuType")),
+                            IsVegetarian = reader.GetBoolean("IsVegetarian"),
+                            IsNonVegetarian = reader.GetBoolean("IsNonVegetarian"),
+                            IsEggetarian = reader.GetBoolean("IsEggetarian"),
+                            SpiceLevel = reader.GetString("SpiceLevel")
                         };
                         menuItems.Add(menuItem);
                     }
@@ -109,6 +126,7 @@ namespace RecommendationEngine.Repositories
             }
             return menuItems;
         }
+
 
 
         public List<MenuItem> GetItemsByDate(DateTime date)

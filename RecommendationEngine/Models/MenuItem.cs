@@ -8,6 +8,10 @@
         public bool AvailabilityStatus { get; set; }
         public List<Feedback> Feedbacks { get; set; }
         public int PreparationCount { get; set; }
+        public bool IsVegetarian { get; set; }
+        public bool IsNonVegetarian { get; set; }
+        public bool IsEggetarian { get; set; }
+        public string SpiceLevel { get; set; }
         public MenuType MenuType { get; set; }
 
     }

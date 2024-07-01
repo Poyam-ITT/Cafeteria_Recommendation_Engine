@@ -22,13 +22,13 @@ namespace RecommendationEngine.Services
             _sentimentAnalysisService = sentimentAnalysisService;
         }
 
-        public void RollOutItems(MenuType menuType, List<MenuItem> itemsToRollOut)
+        public void RollOutItems(MenuType menuType, List<MenuItem> itemsToRollOut, int userId)
         {
             var rolledOutItems = new List<RolledOutItem>();
 
             foreach (var item in itemsToRollOut)
             {
-                var recommendedItem = _recommendationEngine.GetFoodItemForNextDay(menuType, itemsToRollOut.Count)
+                var recommendedItem = _recommendationEngine.GetFoodItemForNextDay(menuType, itemsToRollOut.Count, userId)
                                     .FirstOrDefault(r => r.MenuItem.Id == item.Id);
 
                 if (recommendedItem != null)
@@ -47,31 +47,6 @@ namespace RecommendationEngine.Services
             }
 
             _rolledOutItemRepository.AddRolledOutItems(rolledOutItems);
-        }
-
-        public List<RecommendedItem> GetFoodItemForNextDay(MenuType menuType, int returnItemListSize)
-        {
-            var allMenuItems = _menuItemRepository.GetAll();
-            var filteredItems = allMenuItems.Where(item => item.MenuType == menuType).ToList();
-            var feedbacks = _feedbackRepository.GetAll();
-
-            var scoredItems = filteredItems.Select(item =>
-            {
-                var itemFeedbacks = feedbacks.Where(f => f.MenuItemId == item.Id).ToList();
-                var averageRating = itemFeedbacks.Any() ? itemFeedbacks.Average(f => f.Rating) : 0;
-                var sentimentScores = itemFeedbacks.Select(f => _sentimentAnalysisService.AnalyzeSentiment(f.Comment)).ToList();
-                var positiveSentiments = sentimentScores.Count(s => s > 0);
-
-                return new RecommendedItem
-                {
-                    MenuItem = item,
-                    Score = (item.PreparationCount * 0.4) + (averageRating * 0.3) + (positiveSentiments * 0.3),
-                    AverageRating = averageRating,
-                    PositiveSentiments = positiveSentiments
-                };
-            }).OrderByDescending(i => i.Score).ToList();
-
-            return scoredItems.Take(returnItemListSize).ToList();
         }
 
         public List<MenuItem> GetRolledOutItems()
