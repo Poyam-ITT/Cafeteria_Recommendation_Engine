@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using RecommendationEngine.Models;
+﻿using RecommendationEngine.Models;
 
 namespace RecommendationEngine.Interfaces
 {

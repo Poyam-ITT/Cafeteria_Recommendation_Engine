@@ -1,13 +1,9 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using MySqlX.XDevAPI;
 using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
-using RecommendationEngine.Services;
 
 namespace RecommendationEngine.Sockets
 {

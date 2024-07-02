@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using RecommendationEngine.Models;
-using static Google.Protobuf.Reflection.FeatureSet.Types;
+﻿using RecommendationEngine.Models;
 
 namespace RecommendationEngine.Interfaces
 {

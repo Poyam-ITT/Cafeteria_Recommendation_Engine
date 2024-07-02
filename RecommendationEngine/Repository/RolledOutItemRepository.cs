@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using Dapper;
+﻿using Dapper;
 using MySql.Data.MySqlClient;
 using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;

@@ -1,6 +1,5 @@
 ﻿using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
-using System.Collections.Generic;
 
 namespace RecommendationEngine.Services
 {

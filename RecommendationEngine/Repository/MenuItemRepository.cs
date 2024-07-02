@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using RecommendationEngine.Interfaces;
+﻿using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
 using MySql.Data.MySqlClient;
 
@@ -29,7 +28,6 @@ namespace RecommendationEngine.Repositories
             }
         }
 
-
         public void Update(MenuItem menuItem)
         {
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
@@ -53,7 +51,6 @@ namespace RecommendationEngine.Repositories
                 }
             }
         }
-
 
         public MenuItem FindById(int id)
         {

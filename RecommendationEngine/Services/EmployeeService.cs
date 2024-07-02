@@ -1,7 +1,5 @@
-﻿using System;
-using RecommendationEngine.Interfaces;
+﻿using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
-using RecommendationEngine.Repositories;
 
 namespace RecommendationEngine.Services
 {

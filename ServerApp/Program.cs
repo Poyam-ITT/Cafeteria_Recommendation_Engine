@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using RecommendationEngine.Interfaces;
-using RecommendationEngine.Models;
 using RecommendationEngine.Repositories;
 using RecommendationEngine.Repository;
 using RecommendationEngine.Services;

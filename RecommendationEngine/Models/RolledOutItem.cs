@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RecommendationEngine.Models
+﻿namespace RecommendationEngine.Models
 {
     public class RolledOutItem
     {

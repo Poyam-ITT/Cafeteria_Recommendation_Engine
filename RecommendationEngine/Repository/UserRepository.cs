@@ -1,5 +1,4 @@
-﻿using System;
-using RecommendationEngine.Interfaces;
+﻿using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
 using MySql.Data.MySqlClient;
 

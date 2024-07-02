@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using RecommendationEngine.Interfaces;
+﻿using RecommendationEngine.Interfaces;
 using RecommendationEngine.Utils;
 
 namespace RecommendationEngine.Services
