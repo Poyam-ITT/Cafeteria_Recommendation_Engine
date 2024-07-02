@@ -10,5 +10,7 @@ namespace RecommendationEngine.Interfaces
         void Update(MenuItem menuItem);
         void Delete(int id);
         List<MenuItem> GetAll();
+        List<MenuItem> GetDiscardMenuItems();
+        void RemoveItemFromDiscardedMenuItems(int id);
     }
 }

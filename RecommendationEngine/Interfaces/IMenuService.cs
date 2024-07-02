@@ -8,6 +8,8 @@ namespace RecommendationEngine.Interfaces
         void AddMenuItem(MenuItem menuItem);
         void UpdateMenuItem(int id, MenuItem menuItem);
         void DeleteMenuItem(int id);
-        List<MenuItem> ViewMenuItems(); 
+        List<MenuItem> ViewMenuItems();
+        List<MenuItem> GetDiscardMenuItems();
+        void RemoveFromDiscardedMenuItems(int id);
     }
 }

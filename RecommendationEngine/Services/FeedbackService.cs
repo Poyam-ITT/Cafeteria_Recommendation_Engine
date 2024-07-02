@@ -30,5 +30,10 @@ namespace RecommendationEngine.Services
         {
             return _feedbackRepository.FindByMenuItemId(menuItemId);
         }
+
+        public void MoveLowRatedItemsToDiscardedList()
+        {
+            _feedbackRepository.DiscardLowRatedItems();
+        }
     }
 }

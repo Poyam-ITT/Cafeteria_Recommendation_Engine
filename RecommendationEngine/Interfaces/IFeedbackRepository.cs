@@ -9,5 +9,6 @@ namespace RecommendationEngine.Interfaces
         Feedback FindById(int id);
         IEnumerable<Feedback> FindByMenuItemId(int menuItemId);
         IEnumerable<Feedback> GetAll();
+        void DiscardLowRatedItems();
     }
 }

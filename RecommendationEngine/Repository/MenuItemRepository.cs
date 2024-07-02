@@ -127,34 +127,49 @@ namespace RecommendationEngine.Repositories
             return menuItems;
         }
 
-
-
-        public List<MenuItem> GetItemsByDate(DateTime date)
+        public List<MenuItem> GetDiscardMenuItems()
         {
-            var menuItems = new List<MenuItem>();
+            var discardedItems = new List<MenuItem>();
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "SELECT * FROM MenuItems WHERE DATE(AvailabilityStatus) = @Date";
+                var query = "SELECT * FROM DiscardedMenuItems";
                 using (var cmd = new MySqlCommand(query, connection))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    cmd.Parameters.AddWithValue("@Date", date);
-                    using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        var menuItem = new MenuItem
                         {
-                            menuItems.Add(new MenuItem
-                            {
-                                Id = reader.GetInt32("Id"),
-                                Name = reader.GetString("Name"),
-                                Price = reader.GetDecimal("Price"),
-                                AvailabilityStatus = reader.GetBoolean("AvailabilityStatus")
-                            });
-                        }
+                            Id = reader.GetInt32("MenuItemId"),
+                            Name = reader.GetString("Name"),
+                            Price = reader.GetDecimal("Price"),
+                            AvailabilityStatus = reader.GetBoolean("AvailabilityStatus"),
+                            MenuType = Enum.Parse<MenuType>(reader.GetString("MenuType")),
+                            IsVegetarian = reader.GetBoolean("IsVegetarian"),
+                            IsNonVegetarian = reader.GetBoolean("IsNonVegetarian"),
+                            IsEggetarian = reader.GetBoolean("IsEggetarian"),
+                            SpiceLevel = reader.GetString("SpiceLevel")
+                        };
+                        discardedItems.Add(menuItem);
                     }
                 }
             }
-            return menuItems;
+            return discardedItems;
+        }
+
+        public void RemoveItemFromDiscardedMenuItems(int id)
+        {
+            using (var connection = new MySqlConnection(AppConfig.ConnectionString))
+            {
+                connection.Open();
+                var query = "DELETE FROM DiscardedMenuItems WHERE MenuItemId = @Id";
+                using (var cmd = new MySqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

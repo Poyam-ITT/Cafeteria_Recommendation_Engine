@@ -44,5 +44,15 @@ namespace RecommendationEngine.Services
         {
             return _menuItemRepository.GetAll();
         }
+
+        public List<MenuItem> GetDiscardMenuItems()
+        {
+            return _menuItemRepository.GetDiscardMenuItems();
+        }
+
+        public void RemoveFromDiscardedMenuItems(int id)
+        {
+             _menuItemRepository.RemoveItemFromDiscardedMenuItems(id);
+        }
     }
 }

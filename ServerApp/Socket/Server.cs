@@ -59,11 +59,11 @@ namespace RecommendationEngine.Sockets
 
                 if (role == "Admin")
                 {
-                    message += "Admin Actions:\nPress 1 to add a menu item\nPress 2 to update a menu item\nPress 3 to delete a menu item\nPress 4 to view menu\nPress 5 to Logout\n";
+                    message += "Admin Actions:\nPress 1 to add a menu item\nPress 2 to update a menu item\nPress 3 to delete a menu item\nPress 4 to view menu\nPress 5 to View Discard Menu items\nPress 6 to Logout\n";
                 }
                 else if (role == "Chef")
                 {
-                    message += "Chef Actions:\nPress 1 to roll out items for tomorrow\nPress 2 to generate monthly feedback report\nPress 3 to Logout\n";
+                    message += "Chef Actions:\nPress 1 to roll out items for tomorrow\nPress 2 to generate monthly feedback report\nPress 3 to View Discard Menu Items\nPress 4 to Logout\n";
                 }
                 else if (role == "Employee")
                 {
@@ -94,7 +94,7 @@ namespace RecommendationEngine.Sockets
                         message = HandleEmployeeActions(stream, choice, userId);
                     }
 
-                    if ((role == "Admin" && choice == "5") || (role == "Chef" && choice == "3") || (role == "Employee" && choice == "5"))
+                    if ((role == "Admin" && choice == "6") || (role == "Chef" && choice == "4") || (role == "Employee" && choice == "5"))
                     {
                         SendMessage(stream, "Logging out. Goodbye!");
                         break;
@@ -287,6 +287,8 @@ namespace RecommendationEngine.Sockets
                     Console.WriteLine(message);
                     break;
                 case "5":
+                    return HandleDiscardMenuItemList(stream);
+                case "6":
                     return "Logging out admin actions.\n";
                 default:
                     message = "Invalid choice.\n";
@@ -389,6 +391,8 @@ namespace RecommendationEngine.Sockets
                     Console.WriteLine(message);
                     break;
                 case "3":
+                    return HandleDiscardMenuItemList(stream);
+                case "4":
                     return "Logging out chef actions.\n";
                 default:
                     message = "Invalid choice.\n";
@@ -402,6 +406,7 @@ namespace RecommendationEngine.Sockets
         private string HandleEmployeeActions(NetworkStream stream, string choice, int userId)
         {
             var employeeService = _serviceProvider.GetService<IEmployeeService>();
+            var feedbackService = _serviceProvider.GetService<IFeedbackService>();
             var profileService = _serviceProvider.GetService<IEmployeeProfileService>();
             var notificationService = _serviceProvider.GetService<INotificationService>();
             var menuService = _serviceProvider.GetService<IMenuService>();
@@ -476,6 +481,7 @@ namespace RecommendationEngine.Sockets
                     var comment = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
 
                     employeeService.GiveFeedback(feedbackItemId, rating, comment, userId);
+                    feedbackService.MoveLowRatedItemsToDiscardedList();
                     message = "Feedback submitted.\n";
                     Console.WriteLine(message);
                     break;
@@ -536,5 +542,60 @@ namespace RecommendationEngine.Sockets
             return message;
         }
 
+        private string HandleDiscardMenuItemList(NetworkStream stream)
+        {
+            var menuService = _serviceProvider.GetService<IMenuService>();
+            var discardMenuItems = menuService.GetDiscardMenuItems();
+
+            if (discardMenuItems.Count == 0)
+            {
+                return "No items to discard.";
+            }
+
+            var message = "Discard Menu Item List:\n";
+            foreach (var item in discardMenuItems)
+            {
+                message += $"- Id: {item.Id} || Name: {item.Name}\n";
+            }
+
+            message += "Options:\n1) Remove the Food Item from Menu List\n2) Get Detailed Feedback\n";
+            SendMessage(stream, message);
+
+            var buffer = new byte[1024];
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            var choice = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+            switch (choice)
+            {
+                case "1":
+                    var menuItems = menuService.ViewMenuItems();
+                    if (menuItems.Count == 0)
+                    {
+                        message = "No menu items found.\n";
+                    }
+                    else
+                    {
+                        message = "Menu Items:\n";
+                        foreach (var item in menuItems)
+                        {
+                            message += $"ID: {item.Id}, Name: {item.Name}, Price: {item.Price}, Available: {item.AvailabilityStatus}, Type: {item.MenuType}\n";
+                        }
+                    }
+                    Console.WriteLine(message);
+                    SendMessage(stream, "Enter the id of the food item to remove:");
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var foodItemId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+                    menuService.DeleteMenuItem(foodItemId); 
+                    menuService.RemoveFromDiscardedMenuItems(foodItemId); 
+                    return $"Item Id:{foodItemId} is removed from the menu.";
+                case "2":
+                    SendMessage(stream, "Enter the name of the food item to get detailed feedback for:");
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    foodItemId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
+                    return $"Detailed feedback added for {foodItemId}.";
+                default:
+                    return "Invalid choice.";
+            }
+        }
     }
 }

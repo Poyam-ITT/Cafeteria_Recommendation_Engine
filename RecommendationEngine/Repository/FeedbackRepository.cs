@@ -93,5 +93,51 @@ namespace RecommendationEngine.Repositories
                 return connection.Query<Feedback>("SELECT * FROM Feedback");
             }
         }
+
+        public void DiscardLowRatedItems()
+        {
+            using (var connection = new MySqlConnection(AppConfig.ConnectionString))
+            {
+                connection.Open();
+
+                var query = @"
+                SELECT f.MenuItemId, mi.Name, mi.Price, mi.AvailabilityStatus, mi.MenuType, 
+                       mi.IsVegetarian, mi.IsNonVegetarian, mi.IsEggetarian, mi.SpiceLevel, 
+                       AVG(f.Rating) as AverageRating
+                       FROM Feedback f
+                       JOIN MenuItems mi ON f.MenuItemId = mi.Id
+                       WHERE f.Rating < 2
+                       GROUP BY f.MenuItemId, mi.Name, mi.Price, mi.AvailabilityStatus, mi.MenuType, 
+                       mi.IsVegetarian, mi.IsNonVegetarian, mi.IsEggetarian, mi.SpiceLevel";
+
+                var lowRatedItems = connection.Query(query);
+
+                foreach (var item in lowRatedItems)
+                {
+                    var insertQuery = @"
+                    INSERT INTO discardedmenuitems (MenuItemId, Name, Price, AvailabilityStatus, MenuType, 
+                                                    IsVegetarian, IsNonVegetarian, IsEggetarian, SpiceLevel, 
+                                                    AverageRating, DiscardedDate)
+                                                    VALUES (@MenuItemId, @Name, @Price, @AvailabilityStatus, @MenuType, 
+                                                    @IsVegetarian, @IsNonVegetarian, @IsEggetarian, @SpiceLevel, 
+                                                    @AverageRating, @DiscardedDate)";
+
+                    connection.Execute(insertQuery, new
+                    {
+                        MenuItemId = item.MenuItemId,
+                        Name = item.Name,
+                        Price = item.Price,
+                        AvailabilityStatus = item.AvailabilityStatus,
+                        MenuType = item.MenuType,
+                        IsVegetarian = item.IsVegetarian,
+                        IsNonVegetarian = item.IsNonVegetarian,
+                        IsEggetarian = item.IsEggetarian,
+                        SpiceLevel = item.SpiceLevel,
+                        AverageRating = item.AverageRating,
+                        DiscardedDate = DateTime.Now
+                    });
+                }
+            }
+        }
     }
 }
