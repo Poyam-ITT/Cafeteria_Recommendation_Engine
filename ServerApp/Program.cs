@@ -3,8 +3,9 @@ using RecommendationEngine.Interfaces;
 using RecommendationEngine.Repositories;
 using RecommendationEngine.Repository;
 using RecommendationEngine.Services;
-using RecommendationEngine.Sockets;
 using RecommendationEngine.Utils;
+using ServerApp.Handler;
+using ServerApp.Socket;
 
 namespace ServerApp
 {
@@ -29,6 +30,8 @@ namespace ServerApp
                 .AddSingleton<IEmployeeProfileService, EmployeeProfileService>()
                 .AddSingleton<IRecommendationEngine, RecommendationEngine.Services.RecommendationEngine>() 
                 .AddSingleton<ISentimentAnalysisService, SentimentAnalysisService>()
+                .AddSingleton<IClientHandler, ClientHandler>()
+                .AddSingleton<IRequestHandler, RequestHandler>()
                 .BuildServiceProvider();
             
             // Initialize Database
