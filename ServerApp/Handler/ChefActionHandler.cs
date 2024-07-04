@@ -29,6 +29,8 @@ namespace ServerApp.Handler
                 case "3":
                     return HandleDiscardMenuItemList(stream);
                 case "4":
+                    return HandleViewFeedbackOperation();
+                case "5":
                     return "Logging out chef actions.\n";
                 default:
                     message = "Invalid choice.\n";
@@ -168,6 +170,27 @@ namespace ServerApp.Handler
                 default:
                     return "Invalid choice.";
             }
+        }
+
+        private string HandleViewFeedbackOperation()
+        {
+            var feedbackService = _serviceProvider.GetService<IFeedbackService>();
+            var message = "";
+            var feedback = feedbackService.GetAllFeedbacks();
+            if (feedback == null)
+            {
+                message = "No feedback found.\n";
+            }
+            else
+            {
+                message = "Feedback:\n";
+                foreach (var item in feedback)
+                {
+                    message += $"ID: {item.Id}, UserId: {item.UserId}, MenuItemId: {item.MenuItemId}, Rating: {item.Rating}, Comment: {item.Comment}, FeedbackDate: {item.FeedbackDate}\n";
+                }
+            }
+            Console.WriteLine(message);
+            return message;
         }
 
         private void SendMessage(NetworkStream stream, string message)

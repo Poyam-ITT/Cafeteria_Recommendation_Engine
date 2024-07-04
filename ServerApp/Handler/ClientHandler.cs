@@ -74,7 +74,7 @@ namespace ServerApp.Handler
             return role switch
             {
                 "Admin" => "Admin Actions:\nPress 1 to add a menu item\nPress 2 to update a menu item\nPress 3 to delete a menu item\nPress 4 to view menu\nPress 5 to View Discard Menu items\nPress 6 to Logout\n",
-                "Chef" => "Chef Actions:\nPress 1 to roll out items for tomorrow\nPress 2 to generate monthly feedback report\nPress 3 to View Discard Menu Items\nPress 4 to Logout\n",
+                "Chef" => "Chef Actions:\nPress 1 to roll out items for tomorrow\nPress 2 to generate monthly feedback report\nPress 3 to View Discard Menu Items\nPress 4 to View feedback\nPress 5 to Logout\n",
                 "Employee" => "Employee Actions:\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to View Notifications\nPress 4 to Update Profile\nPress 5 to Logout\n",
                 _ => "Invalid role."
             };
@@ -83,7 +83,7 @@ namespace ServerApp.Handler
         private bool IsLogoutRequest(string role, string choice)
         {
             return (role == "Admin" && choice == "6") ||
-                   (role == "Chef" && choice == "4") ||
+                   (role == "Chef" && choice == "5") ||
                    (role == "Employee" && choice == "5");
         }
     }

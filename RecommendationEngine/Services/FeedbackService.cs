@@ -34,5 +34,10 @@ namespace RecommendationEngine.Services
         {
             _feedbackRepository.DiscardLowRatedItems();
         }
+
+        public IEnumerable<Feedback> GetAllFeedbacks()
+        {
+            return _feedbackRepository.GetAll();
+        }
     }
 }
