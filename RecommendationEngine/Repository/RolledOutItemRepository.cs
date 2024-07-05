@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
 
@@ -33,10 +34,11 @@ namespace RecommendationEngine.Repositories
             {
                 connection.Open();
                 var query = @"
-                            SELECT roi.*, mi.Name, mi.Price, roi.RecommendationScore, roi.AverageRating, roi.SentimentScore
-                            FROM RolledOutItems roi 
-                            JOIN MenuItems mi ON roi.MenuItemId = mi.Id 
-                            WHERE roi.MenuType = @MenuType";
+                              SELECT roi.Id as RolledOutItemId, roi.MenuItemId, roi.MenuType, roi.RecommendationScore, roi.AverageRating, roi.SentimentScore, roi.RolledOutDate, 
+                              mi.Id as MenuItemId, mi.Name, mi.Price, mi.AvailabilityStatus, mi.IsVegetarian, mi.IsNonVegetarian, mi.IsEggetarian, mi.SpiceLevel, mi.MenuType as MenuItemType
+                              FROM RolledOutItems roi 
+                              JOIN MenuItems mi ON roi.MenuItemId = mi.Id 
+                              WHERE roi.MenuType = @MenuType AND DATE(roi.RolledOutDate) = CURDATE()";
                 return connection.Query<RolledOutItem, MenuItem, RolledOutItem>(
                     query,
                     (rolledOutItem, menuItem) =>
