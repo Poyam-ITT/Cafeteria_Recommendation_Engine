@@ -10,6 +10,9 @@ namespace ServerApp.Handler
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IRequestHandler _requestHandler;
+        private string AdminActionString = "\n\n============Admin Actions============\nPress 1 to add a menu item\nPress 2 to update a menu item\nPress 3 to delete a menu item\nPress 4 to view menu\nPress 5 to View Discard Menu items\nPress 6 to View Feedback\nPress 7 to Logout\n";
+        private string ChefActionString = "\n\n============Chef Actions============\nPress 1 to roll out items for tomorrow\nPress 2 to generate monthly feedback report\nPress 3 to View Discard Menu Items\nPress 4 to View feedback\nPress 5 to View Menu\nPress 6 to Logout\n";
+        private string EmployeeActionString = "\n\n============Employee Actions============\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to View Notifications\nPress 4 to Update Profile\nPress 5 to View Menu\nPress 6 to Logout\n";
 
         public ClientHandler(IServiceProvider serviceProvider, IRequestHandler requestHandler)
         {
@@ -74,9 +77,9 @@ namespace ServerApp.Handler
         {
             return role switch
             {
-                "Admin" => "\n\n============Admin Actions============\nPress 1 to add a menu item\nPress 2 to update a menu item\nPress 3 to delete a menu item\nPress 4 to view menu\nPress 5 to View Discard Menu items\nPress 6 to View Feedback\nPress 7 to Logout\n",
-                "Chef" => "\n\n============Chef Actions============\nPress 1 to roll out items for tomorrow\nPress 2 to generate monthly feedback report\nPress 3 to View Discard Menu Items\nPress 4 to View feedback\nPress 5 to View Menu\nPress 6 to Logout\n",
-                "Employee" => "\n\n============Employee Actions============\nPress 1 to view rolled out items\nPress 2 to give feedback on a menu item\nPress 3 to View Notifications\nPress 4 to Update Profile\nPress 5 to View Menu\nPress 6 to Logout\n",
+                "Admin" => AdminActionString,
+                "Chef" => ChefActionString,
+                "Employee" => EmployeeActionString,
                 _ => "Invalid role."
             };
         }

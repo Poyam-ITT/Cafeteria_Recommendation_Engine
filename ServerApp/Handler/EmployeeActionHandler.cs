@@ -185,11 +185,5 @@ namespace ServerApp.Handler
             Console.WriteLine(message);
             return message;
         }
-
-        private void SendMessage(NetworkStream stream, string message)
-        {
-            var responseData = Encoding.ASCII.GetBytes(message);
-            stream.Write(responseData, 0, responseData.Length);
-        }
     }
 }
