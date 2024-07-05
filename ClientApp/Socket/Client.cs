@@ -42,7 +42,7 @@ namespace RecommendationEngine.Sockets
                         break;
                     }
                     var message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received: " + message);
+                    Console.WriteLine(message);
 
                     if (message.Contains("Logging out") || message.Contains("DISCONNECT"))
                     {

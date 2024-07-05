@@ -6,11 +6,11 @@ using System.Text;
 
 namespace ServerApp.Handler
 {
-    public class EmployeeActionHandler
+    public class EmployeeActionHandler : BaseActionHandler
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public EmployeeActionHandler(IServiceProvider serviceProvider)
+        public EmployeeActionHandler(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -19,6 +19,7 @@ namespace ServerApp.Handler
         {
             var employeeService = _serviceProvider.GetService<IEmployeeService>();
             var notificationService = _serviceProvider.GetService<INotificationService>();
+            var menuService = _serviceProvider.GetService<IMenuService>();
             var message = "";
 
             switch (choice)
@@ -32,6 +33,8 @@ namespace ServerApp.Handler
                 case "4":
                     return HandleUpdateProfileOperation(stream, userId);
                 case "5":
+                    return HandleViewMenuItemsOperation(menuService);
+                case "6":
                     return "Logging out employee actions.\n";
                 default:
                     message = "Invalid choice.\n";

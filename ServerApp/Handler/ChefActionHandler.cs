@@ -6,11 +6,11 @@ using System.Text;
 
 namespace ServerApp.Handler
 {
-    public class ChefActionHandler
+    public class ChefActionHandler : BaseActionHandler
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public ChefActionHandler(IServiceProvider serviceProvider)
+        public ChefActionHandler(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -18,6 +18,7 @@ namespace ServerApp.Handler
         public string HandleChefActions(NetworkStream stream, string choice, int userId)
         {
             var chefService = _serviceProvider.GetService<IChefService>();
+            var menuService = _serviceProvider.GetService<IMenuService>();
             var message = "";
 
             switch (choice)
@@ -31,6 +32,8 @@ namespace ServerApp.Handler
                 case "4":
                     return HandleViewFeedbackOperation();
                 case "5":
+                    return HandleViewMenuItemsOperation(menuService);
+                case "6":
                     return "Logging out chef actions.\n";
                 default:
                     message = "Invalid choice.\n";
@@ -130,73 +133,5 @@ namespace ServerApp.Handler
             return message;
         }
 
-        private string HandleDiscardMenuItemList(NetworkStream stream)
-        {
-            var menuService = _serviceProvider.GetService<IMenuService>();
-            var discardMenuItems = menuService.GetDiscardMenuItems();
-
-            if (discardMenuItems.Count == 0)
-            {
-                return "No items to discard.";
-            }
-
-            var message = "Discard Menu Item List:\n";
-            foreach (var item in discardMenuItems)
-            {
-                message += $"- Id: {item.Id} || Name: {item.Name}\n";
-            }
-
-            message += "Options:\n1) Remove the Food Item from Menu List\n2) Get Detailed Feedback\n";
-            SendMessage(stream, message);
-
-            var buffer = new byte[1024];
-            int bytesRead = stream.Read(buffer, 0, buffer.Length);
-            var choice = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
-
-            switch (choice)
-            {
-                case "1":
-                    SendMessage(stream, "Enter the id of the food item to remove:");
-                    bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    var foodItemId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
-                    menuService.DeleteMenuItem(foodItemId);
-                    menuService.RemoveFromDiscardedMenuItems(foodItemId);
-                    return $"Item Id:{foodItemId} is removed from the menu.";
-                case "2":
-                    SendMessage(stream, "Enter the Id of the food item to get detailed feedback for:");
-                    bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    foodItemId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
-                    return $"Detailed feedback added for {foodItemId}.";
-                default:
-                    return "Invalid choice.";
-            }
-        }
-
-        private string HandleViewFeedbackOperation()
-        {
-            var feedbackService = _serviceProvider.GetService<IFeedbackService>();
-            var message = "";
-            var feedback = feedbackService.GetAllFeedbacks();
-            if (feedback == null)
-            {
-                message = "No feedback found.\n";
-            }
-            else
-            {
-                message = "Feedback:\n";
-                foreach (var item in feedback)
-                {
-                    message += $"ID: {item.Id}, UserId: {item.UserId}, MenuItemId: {item.MenuItemId}, Rating: {item.Rating}, Comment: {item.Comment}, FeedbackDate: {item.FeedbackDate}\n";
-                }
-            }
-            Console.WriteLine(message);
-            return message;
-        }
-
-        private void SendMessage(NetworkStream stream, string message)
-        {
-            var responseData = Encoding.ASCII.GetBytes(message);
-            stream.Write(responseData, 0, responseData.Length);
-        }
     }
 }
