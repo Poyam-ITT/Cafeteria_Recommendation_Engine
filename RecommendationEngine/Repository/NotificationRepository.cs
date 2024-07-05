@@ -57,7 +57,7 @@ namespace RecommendationEngine.Repositories
             using (var connection = new MySqlConnection(AppConfig.ConnectionString))
             {
                 connection.Open();
-                var query = "SELECT * FROM Notifications WHERE UserId = @UserId";
+                var query = "SELECT * FROM Notifications WHERE UserId = @UserId AND DATE(Date) = CURDATE()";
                 using (var cmd = new MySqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
