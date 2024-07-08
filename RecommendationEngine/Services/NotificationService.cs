@@ -17,9 +17,9 @@ namespace RecommendationEngine.Services
             _notificationRepository.Save(notification);
         }
 
-        public IEnumerable<Notification> GetNotifications(int userId)
+        public IEnumerable<Notification> GetNotifications()
         {
-            return _notificationRepository.FindByUserId(userId);
+            return _notificationRepository.FindByUserId();
         }
     }
 }

@@ -28,7 +28,7 @@ namespace ServerApp.Handler
                 case "2":
                     return HandleReportOperation(chefService);
                 case "3":
-                    return HandleDiscardMenuItemList(stream);
+                    return HandleDiscardMenuItemList(stream, userId);
                 case "4":
                     return HandleViewFeedbackOperation();
                 case "5":

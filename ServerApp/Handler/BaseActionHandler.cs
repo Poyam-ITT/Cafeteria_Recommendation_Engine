@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RecommendationEngine.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using RecommendationEngine.Models;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerApp.Handler
 {
@@ -38,9 +35,10 @@ namespace ServerApp.Handler
             return message;
         }
 
-        public string HandleDiscardMenuItemList(NetworkStream stream)
+        public string HandleDiscardMenuItemList(NetworkStream stream, int userId)
         {
             var menuService = _serviceProvider.GetService<IMenuService>();
+            var notificationService = _serviceProvider.GetService<INotificationService>();
             var discardMenuItems = menuService.GetDiscardMenuItems();
 
             if (discardMenuItems.Count == 0)
@@ -73,8 +71,18 @@ namespace ServerApp.Handler
                 case "2":
                     SendMessage(stream, "Enter the name of the food item to get detailed feedback for:");
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    foodItemId = int.Parse(Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim());
-                    return $"Detailed feedback added for {foodItemId}.";
+                    var foodItemName = Encoding.ASCII.GetString(buffer, 0, bytesRead).Trim();
+
+                    // Send notification
+                    var notification = new Notification
+                    {
+                        UserId = userId,
+                        Message = $"We are trying to improve your experience with {foodItemName}. Please provide feedback: (Q1.What you did not liked about {foodItemName}? || Q2.How would you like {foodItemName} to taste? || Q3.Share your mom's recipe.)",
+                        Type = NotificationType.DetailedFeedback.ToString(),
+                        Date = DateTime.Now
+                    };
+                    notificationService.SendNotification(notification);
+                    return $"Detailed feedback questions sent through notification for {foodItemName}.";
                 default:
                     return "Invalid choice.";
             }

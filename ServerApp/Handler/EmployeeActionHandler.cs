@@ -29,7 +29,7 @@ namespace ServerApp.Handler
                 case "2":
                     return HandleFeedbackOperation(stream, employeeService, userId);
                 case "3":
-                    return HandleViewNotificationOperation(notificationService);
+                    return HandleViewNotificationOperation(notificationService, userId);
                 case "4":
                     return HandleUpdateProfileOperation(stream, userId);
                 case "5":
@@ -44,6 +44,7 @@ namespace ServerApp.Handler
 
             return message;
         }
+        
         private string HandleViewRollOutItemsOperation(NetworkStream stream,IEmployeeService employeeService)
         {
             var message = "";
@@ -129,13 +130,21 @@ namespace ServerApp.Handler
             return message;
         }
 
-        private string HandleViewNotificationOperation(INotificationService notificationService)
+        private string HandleViewNotificationOperation(INotificationService notificationService, int userId)
         {
-            var message = "Viewing notifications...\n";
-            var notifications = notificationService.GetNotifications(1);
-            foreach (var notification in notifications)
+            var message = "";
+            var notifications = notificationService.GetNotifications();
+            if (notifications == null)
             {
-                message += $"ID: {notification.Id}, Message: {notification.Message}, Type: {notification.Type}, Date: {notification.Date}\n";
+               message = "No feedback found.\n";
+            }
+            else
+            {
+                message = "Viewing notifications...\n";
+                foreach (var notification in notifications)
+                {
+                    message += $"NOTIFICATION: {notification.Message}\n";
+                }
             }
             Console.WriteLine(message);
             return message;

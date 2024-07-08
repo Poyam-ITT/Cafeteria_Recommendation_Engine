@@ -32,7 +32,7 @@ namespace ServerApp.Handler
                 case "4":
                     return HandleViewMenuItemsOperation(menuService);
                 case "5":
-                    return HandleDiscardMenuItemList(stream);
+                    return HandleDiscardMenuItemList(stream, userId);
                 case "6":
                     return HandleViewFeedbackOperation();
                 case "7":

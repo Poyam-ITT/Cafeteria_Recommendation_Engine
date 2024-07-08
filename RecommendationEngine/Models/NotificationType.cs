@@ -4,6 +4,7 @@
     {
         NewItem,
         AvailabilityStatus,
-        Recommendation
+        Recommendation,
+        DetailedFeedback
     }
 }

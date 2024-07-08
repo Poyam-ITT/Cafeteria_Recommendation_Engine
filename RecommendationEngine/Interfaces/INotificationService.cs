@@ -5,6 +5,6 @@ namespace RecommendationEngine.Interfaces
     public interface INotificationService
     {
         void SendNotification(Notification notification);
-        public IEnumerable<Notification> GetNotifications(int userId);
+        public IEnumerable<Notification> GetNotifications();
     }
 }
