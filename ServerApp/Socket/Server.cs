@@ -20,13 +20,28 @@ namespace ServerApp.Socket
 
         public void Start()
         {
-            _listener.Start();
-
-            while (true)
+            try
             {
-                var client = _listener.AcceptTcpClient();
-                var thread = new Thread(() => _clientHandler.HandleClient(client));
-                thread.Start();
+                _listener.Start();
+
+                while (true)
+                {
+                    var client = _listener.AcceptTcpClient();
+                    var thread = new Thread(() => _clientHandler.HandleClient(client));
+                    thread.Start();
+                }
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine($"Socket error when accepting a client: {ex.Message}");
+            }
+            catch (ThreadStateException ex)
+            {
+                Console.WriteLine($"Error when starting a client handler thread: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
     }

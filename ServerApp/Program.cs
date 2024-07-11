@@ -6,6 +6,7 @@ using RecommendationEngine.Services;
 using RecommendationEngine.Utils;
 using ServerApp.Handler;
 using ServerApp.Socket;
+using System.Net.Sockets;
 
 namespace ServerApp
 {
@@ -33,23 +34,33 @@ namespace ServerApp
                 .AddSingleton<IClientHandler, ClientHandler>()
                 .AddSingleton<IRequestHandler, RequestHandler>()
                 .BuildServiceProvider();
-            
-            // Initialize Database
-            DbUtils.InitializeDatabase();
 
-            int startingPort = 5000;
-            int totalOptions = 10;
-
-            for (int i = 0; i < totalOptions; i++)
+            try
             {
-                int port = startingPort + i;
-                var server = new Server(port, serviceProvider);
+                DbUtils.InitializeDatabase();
 
-                Thread serverThread = new Thread(server.Start);
-                serverThread.Start();
+                int startingPort = 5000;
+                int totalOptions = 10;
+
+                for (int i = 0; i < totalOptions; i++)
+                {
+                    int port = startingPort + i;
+                    var server = new Server(port, serviceProvider);
+
+                    Thread serverThread = new Thread(server.Start);
+                    serverThread.Start();
+                }
+
+                Console.WriteLine("Server running...");
             }
-
-            Console.WriteLine("Server running...");
+            catch (SocketException ex)
+            {
+                Console.WriteLine($"Socket error on port: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error occurred: {ex.Message}");
+            }
         }
     }
 }

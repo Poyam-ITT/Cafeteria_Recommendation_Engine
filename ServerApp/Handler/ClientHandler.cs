@@ -66,9 +66,17 @@ namespace ServerApp.Handler
                         _requestHandler.SendMessage(stream, "Authentication failed.");
                     }
                 }
+                catch (SocketException ex)
+                {
+                    _requestHandler.SendMessage(stream, $"A network error occurred. Please check your connection and try again.. {ex.Message}");
+                }
+                catch (FormatException ex)
+                {
+                    _requestHandler.SendMessage(stream, $"The input format was invalid. Please try again. {ex.Message}");
+                }
                 catch (Exception ex)
                 {
-                    _requestHandler.SendMessage(stream, $"An error occurred: {ex.Message}");
+                    _requestHandler.SendMessage(stream, $"An unexpected error occurred: {ex.Message}");
                 }
             }
         }

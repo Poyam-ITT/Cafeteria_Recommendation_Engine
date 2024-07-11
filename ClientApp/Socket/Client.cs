@@ -51,6 +51,16 @@ namespace RecommendationEngine.Sockets
                         break;
                     }
                 }
+                catch (ObjectDisposedException ex)
+                {
+                    Console.WriteLine($"Network stream or client is already closed: {ex.Message}");
+                    break;
+                }
+                catch (SocketException ex)
+                {
+                    Console.WriteLine($"Socket error occurred: {ex.Message}");
+                    break;
+                }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error: " + ex.Message);

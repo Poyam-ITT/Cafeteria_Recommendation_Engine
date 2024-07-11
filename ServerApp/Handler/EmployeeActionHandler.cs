@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RecommendationEngine.Interfaces;
 using RecommendationEngine.Models;
+using RecommendationEngine.Services;
 using System.Net.Sockets;
 using System.Text;
 
@@ -22,24 +23,35 @@ namespace ServerApp.Handler
             var menuService = _serviceProvider.GetService<IMenuService>();
             var message = "";
 
-            switch (choice)
+            try
             {
-                case "1":
-                    return HandleViewRollOutItemsOperation(stream, employeeService);
-                case "2":
-                    return HandleFeedbackOperation(stream, employeeService, userId);
-                case "3":
-                    return HandleViewNotificationOperation(notificationService, userId);
-                case "4":
-                    return HandleUpdateProfileOperation(stream, userId);
-                case "5":
-                    return HandleViewMenuItemsOperation(menuService);
-                case "6":
-                    return "Logging out employee actions.\n";
-                default:
-                    message = "Invalid choice.\n";
-                    Console.WriteLine(message);
-                    break;
+                switch (choice)
+                {
+                    case "1":
+                        return HandleViewRollOutItemsOperation(stream, employeeService);
+                    case "2":
+                        return HandleFeedbackOperation(stream, employeeService, userId);
+                    case "3":
+                        return HandleViewNotificationOperation(notificationService, userId);
+                    case "4":
+                        return HandleUpdateProfileOperation(stream, userId);
+                    case "5":
+                        return HandleViewMenuItemsOperation(menuService);
+                    case "6":
+                        return "Logging out employee actions.\n";
+                    default:
+                        message = "Invalid choice.\n";
+                        Console.WriteLine(message);
+                        break;
+                }
+            }
+            catch (FormatException ex)
+            {
+                message = $"Format Exception occurred: {ex.Message}\n";
+            }
+            catch (Exception ex)
+            {
+                message = $"An error occurred: {ex.Message}\n";
             }
 
             return message;

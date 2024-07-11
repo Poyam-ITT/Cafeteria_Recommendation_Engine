@@ -21,25 +21,36 @@ namespace ServerApp.Handler
             var notificationService = _serviceProvider.GetService<INotificationService>();
             var message = "";
 
-            switch (choice)
+            try
             {
-                case "1":
-                    return HandleAddMenuItemOperation(stream, menuService, notificationService, userId);
-                case "2":
-                    return HandleUpdateMenuItemOperation(stream, menuService, notificationService, userId);
-                case "3":
-                    return HandleDeleteMenuItemOperation(stream, menuService);
-                case "4":
-                    return HandleViewMenuItemsOperation(menuService);
-                case "5":
-                    return HandleDiscardMenuItemList(stream, userId);
-                case "6":
-                    return HandleViewFeedbackOperation();
-                case "7":
-                    return "Logging out admin actions.\n";
-                default:
-                    message = "Invalid choice.\n";
-                    break;
+                switch (choice)
+                {
+                    case "1":
+                        return HandleAddMenuItemOperation(stream, menuService, notificationService, userId);
+                    case "2":
+                        return HandleUpdateMenuItemOperation(stream, menuService, notificationService, userId);
+                    case "3":
+                        return HandleDeleteMenuItemOperation(stream, menuService);
+                    case "4":
+                        return HandleViewMenuItemsOperation(menuService);
+                    case "5":
+                        return HandleDiscardMenuItemList(stream, userId);
+                    case "6":
+                        return HandleViewFeedbackOperation();
+                    case "7":
+                        return "Logging out admin actions.\n";
+                    default:
+                        message = "Invalid choice.\n";
+                        break;
+                }
+            }
+            catch(FormatException ex)
+            {
+                message = $"Format Exception occurred: {ex.Message}\n";
+            }
+            catch(Exception ex)
+            {
+                message = $"An error occurred: {ex.Message}\n";
             }
 
             return message;
