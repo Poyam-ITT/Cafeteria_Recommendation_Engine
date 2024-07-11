@@ -10,26 +10,26 @@ namespace RecommendationEngine.Tests.Services
         [Test]
         public void VerifyUpdateMenuItemUpdatesExistingMenuItem()
         {
-            var existingMenuItem = new MenuItem { Id = TestConstants.MenuItemId, Name = "Uttpam", Price = 40 };
+            var existingMenuItem = new MenuItem { Id = MenuItemConstant.MenuItemId, Name = "Uttpam", Price = 40 };
 
-            _menuItemRepositoryMock.Setup(menuItemRepo => menuItemRepo.FindById(TestConstants.MenuItemId)).Returns(existingMenuItem);
+            _menuItemRepositoryMock.Setup(menuItemRepo => menuItemRepo.FindById(MenuItemConstant.MenuItemId)).Returns(existingMenuItem);
 
-            _menuService.UpdateMenuItem(TestConstants.MenuItemId, TestConstants.TestMenuItem);
+            _menuService.UpdateMenuItem(MenuItemConstant.MenuItemId, MenuItemConstant.TestMenuItem);
 
             _menuItemRepositoryMock.Verify(menuItemRepo => menuItemRepo.Update(It.Is<MenuItem>(item =>
-                item.Id == TestConstants.MenuItemId &&
-                item.Name == TestConstants.TestMenuItem.Name &&
-                item.Price == TestConstants.TestMenuItem.Price &&
-                item.AvailabilityStatus == TestConstants.TestMenuItem.AvailabilityStatus &&
-                item.MenuType == TestConstants.TestMenuItem.MenuType &&
-                item.IsVegetarian == TestConstants.TestMenuItem.IsVegetarian &&
-                item.IsNonVegetarian == TestConstants.TestMenuItem.IsNonVegetarian &&
-                item.IsEggetarian == TestConstants.TestMenuItem.IsEggetarian &&
-                item.SpiceLevel == TestConstants.TestMenuItem.SpiceLevel
+                item.Id == MenuItemConstant.MenuItemId &&
+                item.Name == MenuItemConstant.TestMenuItem.Name &&
+                item.Price == MenuItemConstant.TestMenuItem.Price &&
+                item.AvailabilityStatus == MenuItemConstant.TestMenuItem.AvailabilityStatus &&
+                item.MenuType == MenuItemConstant.TestMenuItem.MenuType &&
+                item.IsVegetarian == MenuItemConstant.TestMenuItem.IsVegetarian &&
+                item.IsNonVegetarian == MenuItemConstant.TestMenuItem.IsNonVegetarian &&
+                item.IsEggetarian == MenuItemConstant.TestMenuItem.IsEggetarian &&
+                item.SpiceLevel == MenuItemConstant.TestMenuItem.SpiceLevel
             )), Times.Once);
 
-            AssertWrapper.AssertExpectedMatchesActual(TestConstants.TestMenuItem.Name, existingMenuItem.Name, "Menu Item name doesn't match");
-            AssertWrapper.AssertExpectedMatchesActual(TestConstants.TestMenuItem.Price, existingMenuItem.Price, "Menu Item price doesn't match");
+            AssertWrapper.AssertExpectedMatchesActual(MenuItemConstant.TestMenuItem.Name, existingMenuItem.Name, "Menu Item name doesn't match");
+            AssertWrapper.AssertExpectedMatchesActual(MenuItemConstant.TestMenuItem.Price, existingMenuItem.Price, "Menu Item price doesn't match");
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace RecommendationEngine.Tests.Services
         {
             var menuItems = new List<MenuItem>
             {
-                new MenuItem { Id = TestConstants.MenuItemId, Name = TestConstants.MenuItemName, Price = TestConstants.MenuItemPrice },
+                new MenuItem { Id = MenuItemConstant.MenuItemId, Name = MenuItemConstant.MenuItemName, Price = MenuItemConstant.MenuItemPrice },
                 new MenuItem { Id = 2, Name = "Upma", Price = 40 }
             };
 
@@ -46,7 +46,7 @@ namespace RecommendationEngine.Tests.Services
             var result = _menuService.ViewMenuItems();
 
             AssertWrapper.AssertExpectedMatchesActual(2, result.Count, "Item Count is not updated");
-            AssertWrapper.AssertExpectedMatchesActual(TestConstants.MenuItemName, result[0].Name, "Name for item 1 doesn't match");
+            AssertWrapper.AssertExpectedMatchesActual(MenuItemConstant.MenuItemName, result[0].Name, "Name for item 1 doesn't match");
             AssertWrapper.AssertExpectedMatchesActual("Upma", result[1].Name, "Name for item 2 doesn't match");
         }
 
@@ -70,7 +70,7 @@ namespace RecommendationEngine.Tests.Services
         {
             var discardedMenuItems = new List<MenuItem>
             {
-                new MenuItem { Id = TestConstants.MenuItemId, Name = "Sambhar Vada", Price = 70 }
+                new MenuItem { Id = MenuItemConstant.MenuItemId, Name = "Sambhar Vada", Price = 70 }
             };
 
             _menuItemRepositoryMock.Setup(menuItemRepo => menuItemRepo.GetDiscardMenuItems()).Returns(discardedMenuItems);
@@ -86,12 +86,12 @@ namespace RecommendationEngine.Tests.Services
         {
             _menuItemRepositoryMock.Setup(menuItemRepo => menuItemRepo.FindById(222222)).Returns((MenuItem)null);
 
-            _menuService.UpdateMenuItem(TestConstants.MenuItemId, TestConstants.TestMenuItem);
+            _menuService.UpdateMenuItem(MenuItemConstant.MenuItemId, MenuItemConstant.TestMenuItem);
 
             _menuItemRepositoryMock.Verify(menuItemRepo => menuItemRepo.Update(It.IsAny<MenuItem>()), Times.Never);
 
-            AssertWrapper.AssertExpectedMatchesActual(TestConstants.MenuItemName, TestConstants.TestMenuItem.Name, "Menu Item name changed");
-            AssertWrapper.AssertExpectedMatchesActual(TestConstants.MenuItemPrice, TestConstants.TestMenuItem.Price, "Menu Item price changed");
+            AssertWrapper.AssertExpectedMatchesActual(MenuItemConstant.MenuItemName, MenuItemConstant.TestMenuItem.Name, "Menu Item name changed");
+            AssertWrapper.AssertExpectedMatchesActual(MenuItemConstant.MenuItemPrice, MenuItemConstant.TestMenuItem.Price, "Menu Item price changed");
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using RecommendationEngine.Models;
 
-public static class TestConstants
+public static class MenuItemConstant
 {
     public const int MenuItemId = 1;
     public const string MenuItemName = "Dosa";
